@@ -7,6 +7,7 @@ A qq bot based on nonebot2 and go-cqhttp
 目前已实现功能：  
 -推送：开播提醒、动态发布提醒、QA发布提醒、日程表发布提醒、抖音小视频提醒  
 -随机冷笑话、表情包、小作文  
+-重开模拟器  
 -狗屁不通、绝绝子生成器  
 -每日运势  
 -more to discover  
