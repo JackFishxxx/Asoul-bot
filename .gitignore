@@ -1,0 +1,6 @@
+*.env.dev
+src/data/goods/
+src/data/dynamics/
+src/backup/
+src/drivers/*
+__pycache__
