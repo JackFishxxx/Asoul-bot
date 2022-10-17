@@ -1,4 +1,4 @@
-import json
+﻿import json
 from nonebot import on_startswith
 from nonebot.adapters import Bot, Event
 import requests
@@ -15,15 +15,18 @@ async def handle_first_receive(bot: Bot, event: Event):
 
     # if it is shortlink
     if msg.startswith("https://b23.tv/") or msg.startswith("b23.tv"):
-        url = sync(get_real_url(msg))
-        vid = 'BV'+url.split('?')[0].split('BV')[1]
+        #url = sync(get_real_url(msg))
+        url = await get_real_url(msg)
+        #print(dir(url),url.path)
+        vid = 'BV'+url.path.split('/')[2].lstrip('BV')
         url = "https://api.bilibili.com/x/web-interface/view?bvid="+vid
     elif msg.startswith("av"):
         vid = msg.split("av")[-1]
         url = "https://api.bilibili.com/x/web-interface/view?aid="+vid
         vid = "av"+vid
     else:
-        vid = 'BV'+msg.split('?')[0].split('BV')[1]
+        #print(msg, msg.split('?')[0],msg.split('?')[0].split('BV',1)[1])
+        vid = 'BV'+msg.split('?')[0].split('BV',1)[1].rstrip('/')
         url = "https://api.bilibili.com/x/web-interface/view?bvid="+vid
     
     response = requests.get(url)
@@ -39,9 +42,10 @@ async def handle_first_receive(bot: Bot, event: Event):
         msg = "视频标题：{}\nUP主：{}\n{}\n{}".format(title, up, url, cq)
     
         await bot.send_group_msg(group_id=group, message=msg)
-    except nonebot.adapters.cqhttp.exception.ActionFailed:
+    except nonebot.adapters.onebot.exception.ActionFailed:
 
-        msg = "视频内容疑似被阻拦，暂时无法返回信息。"
+        msg = "视频内容疑似被风控，暂时无法返回信息。"
+        #msg = "视频标题：{}\nUP主：{}\n{}\n{}".format(title, up, url, cq)
     
         await bot.send_group_msg(group_id=group, message=msg)
      

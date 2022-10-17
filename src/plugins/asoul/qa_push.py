@@ -12,11 +12,12 @@ scheduler = require("nonebot_plugin_apscheduler").scheduler
 @scheduler.scheduled_job('interval', minutes=10, id="get_qa")
 async def main():
 
-    push_groups = bot.config.push_groups
-
     t = time.localtime()
     tw = t.tm_wday
     bot = nonebot.get_bot()
+    
+    push_groups = bot.config.push_groups
+    
     if tw == 1:
         u = user.User(uid)
         page = await u.get_articles(0)

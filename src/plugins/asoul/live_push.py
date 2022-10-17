@@ -1,12 +1,13 @@
-import json
+﻿import json
 import os
 import nonebot
+import time
 from bilibili_api import live
-from nonebot import require
+from nonebot.plugin import require
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 
-@scheduler.scheduled_job('interval', minutes=3, id="get_live")
+@scheduler.scheduled_job('interval', minutes=5, id="live_push")
 async def main():
 
     bot = nonebot.get_bot()
@@ -42,22 +43,27 @@ async def main():
             msg = "直播标题：{}\nUP主：{}\n直播状态：{}\n{}\n{}".format(title, uname, status, url, cq)
             
             # update
-            with open(data_path, 'w') as fp:
-                asoul[str(uid)]["live"]["pushed"] = 1
-                asoul[str(uid)]["live"]["status"] = live_status
-                json.dump(asoul, fp)
+            asoul[str(uid)]["live"]["pushed"] = 1
+            asoul[str(uid)]["live"]["status"] = 1
 
             for push_group in push_groups:
-                await bot.send_group_msg(group_id=push_group,message=msg)
-                
-        # stop streaming
-        elif live_status == 0 and pushed == 1:
-            # update
-            with open(data_path, 'w') as fp:
-                asoul[str(uid)]["live"]["pushed"] = 0
-                asoul[str(uid)]["live"]["status"] = live_status
-                json.dump(asoul, fp)
+                try:
+                    await bot.send_group_msg(group_id=push_group,message=msg)
+                except Exception as e:
+                    print("Can not push live!")
         
-        # on streaming and pushed, or not streaming
+        # on streaming and pushed
+        elif live_status == 1 and pushed == 1:
+            # update
+            asoul[str(uid)]["live"]["pushed"] = 1
+            asoul[str(uid)]["live"]["status"] = 1
+
+        # not streaming
         else:
-            pass
+            # update
+            asoul[str(uid)]["live"]["pushed"] = 0
+            asoul[str(uid)]["live"]["status"] = 0
+
+    with open(data_path, 'w') as fp:
+        json.dump(asoul, fp)
+        
